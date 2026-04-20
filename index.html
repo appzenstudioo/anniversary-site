@@ -21,6 +21,7 @@ body{
   max-width:420px;
   height:100vh;
   position:relative;
+  overflow:hidden;
 }
 
 /* screens */
@@ -32,30 +33,33 @@ body{
 }
 .active{display:block;}
 
-/* image container */
-.bg{
+/* BACKGROUND LAYER (blur) */
+.bg-blur{
+  position:absolute;
   width:100%;
   height:100%;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:black;
+  background-size:cover;
+  background-position:center;
+  filter:blur(20px) brightness(0.6);
+  transform:scale(1.1);
 }
 
-.bg img{
+/* MAIN IMAGE */
+.main-img{
+  position:absolute;
   width:100%;
   height:100%;
-  object-fit:contain; /* 🔥 no cutting */
+  object-fit:contain;
 }
 
-/* bottom overlay */
+/* overlay */
 .overlay{
   position:absolute;
   bottom:20px;
   left:50%;
   transform:translateX(-50%);
   width:85%;
-  background:rgba(0,0,0,0.65);
+  background:rgba(0,0,0,0.6);
   padding:15px;
   border-radius:12px;
   text-align:center;
@@ -70,9 +74,7 @@ button{
   margin-top:10px;
 }
 
-h1,h2,p{
-  margin:5px 0;
-}
+h1,h2,p{margin:5px 0;}
 </style>
 </head>
 
@@ -88,9 +90,8 @@ h1,h2,p{
 
 <!-- MAIN -->
 <div id="main" class="screen">
-  <div class="bg">
-    <img id="mainImg">
-  </div>
+  <div id="mainBlur" class="bg-blur"></div>
+  <img id="mainImg" class="main-img">
 
   <div class="overlay">
     <h2>Happy Anniversary 💖</h2>
@@ -101,9 +102,8 @@ h1,h2,p{
 
 <!-- TIMELINE -->
 <div id="timeline" class="screen">
-  <div class="bg">
-    <img id="timelineImg">
-  </div>
+  <div id="timelineBlur" class="bg-blur"></div>
+  <img id="timelineImg" class="main-img">
 
   <div class="overlay">
     <h2>Our Family 💖</h2>
@@ -135,9 +135,14 @@ function start(){
 
 /* MAIN SLIDES */
 function showSlides(){
-  const img = document.getElementById("mainImg");
 
-  img.src = "images/" + slides[slideIndex];
+  const img = document.getElementById("mainImg");
+  const blur = document.getElementById("mainBlur");
+
+  let src = "images/" + slides[slideIndex];
+
+  img.src = src;
+  blur.style.backgroundImage = "url('" + src + "')";
 
   slideIndex++;
 
@@ -167,7 +172,7 @@ function startTimer(){
   },1000);
 }
 
-/* OPEN TIMELINE */
+/* TIMELINE */
 function openTimeline(){
   document.getElementById("main").classList.remove("active");
   document.getElementById("timeline").classList.add("active");
@@ -176,11 +181,16 @@ function openTimeline(){
   showKids();
 }
 
-/* KIDS SLIDES */
+/* KIDS */
 function showKids(){
-  const img = document.getElementById("timelineImg");
 
-  img.src = "images/" + kids[kidIndex];
+  const img = document.getElementById("timelineImg");
+  const blur = document.getElementById("timelineBlur");
+
+  let src = "images/" + kids[kidIndex];
+
+  img.src = src;
+  blur.style.backgroundImage = "url('" + src + "')";
 
   kidIndex++;
 
