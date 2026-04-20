@@ -29,20 +29,8 @@ body{
   width:100%;
   height:100%;
   display:none;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  text-align:center;
 }
-.active{display:flex;}
-
-button{
-  padding:10px 20px;
-  border:none;
-  border-radius:20px;
-  background:gold;
-  margin-top:15px;
-}
+.active{display:block;}
 
 /* background */
 .bg{
@@ -50,25 +38,29 @@ button{
   height:100%;
   background-size:cover;
   background-position:center;
-  display:flex;
-  justify-content:center;
-  align-items:center;
+  transition:background-image 0.8s ease-in-out;
 }
 
-/* overlay */
+/* bottom overlay */
 .overlay{
-  background:rgba(0,0,0,0.6);
-  padding:20px;
-  border-radius:10px;
+  position:absolute;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  width:85%;
+  background:rgba(0,0,0,0.65);
+  padding:15px;
+  border-radius:12px;
+  text-align:center;
 }
 
-/* fade */
-.fade{
-  animation:fade 1s;
-}
-@keyframes fade{
-  from{opacity:0;}
-  to{opacity:1;}
+/* button */
+button{
+  padding:10px 20px;
+  border:none;
+  border-radius:20px;
+  background:gold;
+  margin-top:10px;
 }
 </style>
 </head>
@@ -78,16 +70,31 @@ button{
 <div class="app">
 
 <!-- START -->
-<div id="start" class="screen active">
+<div id="start" class="screen active" style="display:flex;justify-content:center;align-items:center;flex-direction:column;">
   <h1>Welcome ❤️</h1>
   <button onclick="start()">Start</button>
 </div>
 
-<!-- MAIN SLIDES -->
-<div id="main" class="screen"></div>
+<!-- MAIN -->
+<div id="main" class="screen">
+  <div class="bg" id="mainBg"></div>
+
+  <div class="overlay">
+    <h2>Happy Anniversary 💖</h2>
+    <p id="timer"></p>
+    <button onclick="openTimeline()">Timeline 👶</button>
+  </div>
+</div>
 
 <!-- TIMELINE -->
-<div id="timeline" class="screen"></div>
+<div id="timeline" class="screen">
+  <div class="bg" id="timelineBg"></div>
+
+  <div class="overlay">
+    <h2>Our Family 💖</h2>
+    <button onclick="back()">Back</button>
+  </div>
+</div>
 
 </div>
 
@@ -95,9 +102,9 @@ button{
 
 const startDate = new Date("2016-04-21T00:00:00+05:30");
 
-let timer;
 let slideIndex = 0;
 let kidIndex = 0;
+let timer;
 
 const slides = ["w1.jpeg","w2.jpeg","w3.jpeg"];
 const kids = ["d1.jpeg","d2.jpeg","s1.jpeg"];
@@ -106,31 +113,17 @@ const kids = ["d1.jpeg","d2.jpeg","s1.jpeg"];
 function start(){
   document.getElementById("start").classList.remove("active");
   document.getElementById("main").classList.add("active");
+
   showSlides();
+  startTimer();
 }
 
-/* MAIN SLIDESHOW */
+/* MAIN SLIDES (NO REFRESH) */
 function showSlides(){
+  const bg = document.getElementById("mainBg");
 
-  const main = document.getElementById("main");
-
-  main.innerHTML = `
-    <div class="bg fade" id="bg">
-      <div class="overlay">
-        <h1>Happy Anniversary 💖</h1>
-        <p id="timer"></p>
-        <button onclick="openTimeline()">Timeline 👶</button>
-      </div>
-    </div>
-  `;
-
-  document.getElementById("bg").style.backgroundImage =
+  bg.style.backgroundImage =
     "url('images/" + slides[slideIndex] + "')";
-
-  /* timer only on first slide */
-  if(slideIndex === 0){
-    startTimer();
-  }
 
   slideIndex++;
 
@@ -154,35 +147,23 @@ function startTimer(){
     let y = Math.floor(d/365);
 
     document.getElementById("timer").innerHTML =
-      `${y} Years | ${mo%12} Months | ${w%4} Weeks<br>
-       ${d%7} Days | ${h%24} H | ${m%60} M | ${s%60} S`;
+      `${y}Y | ${mo%12}M | ${w%4}W<br>
+       ${d%7}D | ${h%24}H | ${m%60}M | ${s%60}S`;
   },1000);
 }
 
-/* OPEN TIMELINE */
+/* TIMELINE */
 function openTimeline(){
   document.getElementById("main").classList.remove("active");
-  const tl = document.getElementById("timeline");
-  tl.classList.add("active");
-
-  tl.innerHTML = `
-    <div class="bg fade" id="bg2">
-      <div class="overlay">
-        <h2>Our Beautiful Family 💖</h2>
-        <button onclick="back()">Back</button>
-      </div>
-    </div>
-  `;
+  document.getElementById("timeline").classList.add("active");
 
   kidIndex = 0;
   showKids();
 }
 
-/* KIDS SLIDESHOW */
+/* KIDS SLIDES (NO REFRESH) */
 function showKids(){
-
-  const bg = document.getElementById("bg2");
-  if(!bg) return;
+  const bg = document.getElementById("timelineBg");
 
   bg.style.backgroundImage =
     "url('images/" + kids[kidIndex] + "')";
