@@ -34,16 +34,20 @@ body{
   width:100%;
   height:100%;
   object-fit:contain;
-  transition:opacity 0.8s;
+  opacity:0;
+  transition:opacity 1s ease, transform 6s ease;
 }
+.zoom{ transform:scale(1.08); }
 
-/* blur */
+/* blur bg */
 .bg-blur{
   position:absolute;
   width:100%;
   height:100%;
   background-size:cover;
+  background-position:center;
   filter:blur(25px) brightness(0.6);
+  transform:scale(1.1);
 }
 
 /* overlay */
@@ -68,9 +72,10 @@ body{
   width:0%;
 }
 
-/* ❤️ hearts */
+/* hearts */
 .heart{
   position:absolute;
+  font-size:18px;
   animation:float 6s linear;
 }
 @keyframes float{
@@ -78,7 +83,7 @@ body{
   to{transform:translateY(-10vh);}
 }
 
-/* 🚗 ROAD */
+/* timeline */
 .road{
   position:absolute;
   bottom:40%;
@@ -92,7 +97,7 @@ body{
   bottom:37%;
   font-size:28px;
   left:0%;
-  transition:left 2s ease-in-out; /* 🔥 smooth drive */
+  transition:left 1.8s ease-in-out;
 }
 </style>
 </head>
@@ -106,7 +111,7 @@ body{
 <!-- START -->
 <div id="start" class="screen active" style="display:flex;justify-content:center;align-items:center;flex-direction:column;">
   <h1>❤️ Welcome ❤️</h1>
-  <button onclick="start()">Start</button>
+  <p>Tap to Begin</p>
 </div>
 
 <!-- MAIN -->
@@ -116,7 +121,7 @@ body{
 
   <div class="overlay">
     <h2 id="quote"></h2>
-    <button onclick="goTimeline()">Timeline 🚗</button>
+    <button onclick="goTimeline()">Our Journey 🚗</button>
   </div>
 </div>
 
@@ -130,10 +135,33 @@ body{
   <img id="tImg" class="main-img">
 
   <div class="overlay">
-    <h3 id="year"></h3>
+    <div id="year"></div>
     <button onclick="nextYear()">Next ➡️</button>
   </div>
 
+</div>
+
+<!-- FINAL -->
+<div id="final" class="screen">
+  <div class="bg-blur" style="background-image:url('images/w9.jpeg')"></div>
+  <img src="images/w9.jpeg" class="main-img" style="opacity:1">
+
+  <div class="overlay">
+    <h2>❤️ Happy 10th Anniversary ❤️</h2>
+    <p>
+      10 years of love… ❤️<br>
+      A journey that began with two hearts<br>
+      and grew into a beautiful family 💖<br><br>
+
+      From Rama & Satish…<br>
+      to proud parents of<br>
+      Kundana Priya, Gaanavi Priya,<br>
+      and little prince Himansh Kaarthikeya Ram 👑<br><br>
+
+      This is not just time…<br>
+      This is love, life, and forever ✨
+    </p>
+  </div>
 </div>
 
 </div>
@@ -143,34 +171,49 @@ body{
 /* SLIDES */
 const slides = [
   {img:"w1.jpeg", text:"The day everything began ❤️"},
-  {img:"w2.jpeg", text:"Two hearts, one journey 💖"},
-  {img:"w3.jpeg", text:"Love growing stronger 🌸"},
-  {img:"w4.jpeg", text:"Memories forever ✨"},
-  {img:"w5.jpeg", text:"Moments of happiness 💞"},
+  {img:"w2.jpeg", text:"Two hearts, one promise 💖"},
+  {img:"w3.jpeg", text:"A journey of love ✨"},
+  {img:"w4.jpeg", text:"Smiles that never fade 😊"},
+  {img:"w5.jpeg", text:"Memories forever 🌸"},
   {img:"w6.jpeg", text:"Together through everything 🤝"},
-  {img:"w7.jpeg", text:"Still smiling together 😊"},
-  {img:"w8.jpeg", text:"Still in love ❤️"},
+  {img:"w7.jpeg", text:"Love growing stronger 💞"},
+  {img:"w8.jpeg", text:"Still falling in love ❤️"},
   {img:"w9.jpeg", text:"Forever begins again 💫"}
 ];
 
-/* TIMELINE */
+/* TIMELINE (EMOTIONAL) */
 const timeline = [
-  {year:"2016 💍", img:"w1.jpeg"},
-  {year:"2020 👶", img:"d1.jpeg"},
-  {year:"2023 👶", img:"d2.jpeg"},
-  {year:"2025 👑", img:"s1.jpeg"}
+  {
+    year:"2016 💍",
+    img:"w1.jpeg",
+    text:"Two souls became one…<br>A promise that started a beautiful journey ❤️"
+  },
+  {
+    year:"2020 👶",
+    img:"d1.jpeg",
+    text:"Their love found a new form…<br>Kundana Priya was born 💖<br>A little princess who filled their lives with joy ✨"
+  },
+  {
+    year:"2023 👶",
+    img:"d2.jpeg",
+    text:"Happiness doubled…<br>Gaanavi Priya arrived 🌸<br>Another blessing, another reason to smile 😊"
+  },
+  {
+    year:"2025 👑",
+    img:"s1.jpeg",
+    text:"The family became complete…<br>King Himansh Kaarthikeya Ram 👑<br>A little prince, a lifetime of happiness 💞"
+  }
 ];
 
 let i=0, t=0;
 
 /* START */
-function start(){
+document.getElementById("start").onclick = ()=>{
   document.getElementById("start").classList.remove("active");
   document.getElementById("main").classList.add("active");
-
   hearts();
   showSlide();
-}
+};
 
 /* SLIDES */
 function showSlide(){
@@ -178,31 +221,42 @@ function showSlide(){
   let s = slides[i];
   let src = "images/" + s.img;
 
-  document.getElementById("img").src = src;
-  document.getElementById("blur").style.backgroundImage = `url('${src}')`;
-  document.getElementById("quote").innerText = s.text;
+  let img = document.getElementById("img");
 
-  progress();
+  img.classList.remove("zoom");
+  img.style.opacity = 0;
+
+  setTimeout(()=>{
+    img.src = src;
+    document.getElementById("blur").style.backgroundImage = `url('${src}')`;
+    document.getElementById("quote").innerText = s.text;
+
+    img.style.opacity = 1;
+    img.classList.add("zoom");
+
+    progress();
+  },300);
 
   i++;
 
   if(i < slides.length){
-    setTimeout(showSlide, 4000);
+    setTimeout(showSlide, 4500);
   }
 }
 
 /* PROGRESS */
 function progress(){
   let bar = document.getElementById("progress");
-  bar.style.width = "0%";
+  bar.style.transition="none";
+  bar.style.width="0%";
 
   setTimeout(()=>{
-    bar.style.transition="width 4s linear";
+    bar.style.transition="width 4.5s linear";
     bar.style.width="100%";
   },50);
 }
 
-/* ❤️ HEARTS */
+/* HEARTS */
 function hearts(){
   setInterval(()=>{
     let h=document.createElement("div");
@@ -211,29 +265,36 @@ function hearts(){
     h.style.left=Math.random()*100+"%";
     document.body.appendChild(h);
     setTimeout(()=>h.remove(),6000);
-  },800);
+  },1000);
 }
 
-/* GO TIMELINE */
+/* TIMELINE */
 function goTimeline(){
   document.getElementById("main").classList.remove("active");
   document.getElementById("timeline").classList.add("active");
-
   t=0;
   showYear();
 }
 
-/* SHOW YEAR */
 function showYear(){
 
   let data = timeline[t];
   let src = "images/" + data.img;
 
-  document.getElementById("tImg").src = src;
-  document.getElementById("tBlur").style.backgroundImage = `url('${src}')`;
-  document.getElementById("year").innerText = data.year;
+  let img = document.getElementById("tImg");
 
-  /* 🚗 SMOOTH CAR DRIVE */
+  img.style.opacity = 0;
+
+  setTimeout(()=>{
+    img.src = src;
+    document.getElementById("tBlur").style.backgroundImage = `url('${src}')`;
+
+    document.getElementById("year").innerHTML =
+      `<strong>${data.year}</strong><br><br>${data.text}`;
+
+    img.style.opacity = 1;
+  },300);
+
   document.getElementById("car").style.left = (t * 30) + "%";
 }
 
@@ -242,6 +303,9 @@ function nextYear(){
   t++;
   if(t < timeline.length){
     showYear();
+  } else {
+    document.getElementById("timeline").classList.remove("active");
+    document.getElementById("final").classList.add("active");
   }
 }
 
