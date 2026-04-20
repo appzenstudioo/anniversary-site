@@ -3,8 +3,6 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="preload" as="image" href="images/w1.jpeg">
-
 <style>
 body{
   margin:0;
@@ -25,9 +23,14 @@ body{
   position:absolute;
   width:100%;
   height:100%;
-  display:none;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.6s ease;
 }
-.active{display:block;}
+.active{
+  opacity:1;
+  pointer-events:auto;
+}
 
 .main-img{
   position:absolute;
@@ -35,9 +38,13 @@ body{
   height:100%;
   object-fit:contain;
   opacity:0;
-  transition:opacity 0.8s ease, transform 6s ease;
+  transform:scale(1);
+  transition:opacity 1s ease, transform 6s ease;
 }
-.zoom{transform:scale(1.08);}
+.show{
+  opacity:1;
+  transform:scale(1.08);
+}
 
 .bg-blur{
   position:absolute;
@@ -61,13 +68,12 @@ body{
   text-align:center;
 }
 
-.pulse-btn{
-  animation:pulse 1.5s infinite;
-}
-@keyframes pulse{
-  0%{box-shadow:0 0 0 0 rgba(255,0,100,0.7);}
-  70%{box-shadow:0 0 0 15px rgba(255,0,100,0);}
-  100%{box-shadow:0 0 0 0 rgba(255,0,100,0);}
+button{
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  background:#ff4d6d;
+  color:white;
 }
 
 .progress{
@@ -78,47 +84,21 @@ body{
   width:0%;
 }
 
-.heart{
-  position:absolute;
-  animation:float 6s linear;
-}
-@keyframes float{
-  from{transform:translateY(100vh);}
-  to{transform:translateY(-10vh);}
-}
-
-.balloon{
-  position:absolute;
-  animation:balloon 10s linear;
-}
-@keyframes balloon{
-  from{transform:translateY(100vh);}
-  to{transform:translateY(-20vh);}
-}
-
-.road{
-  position:absolute;
-  bottom:40%;
-  width:100%;
-  height:6px;
-  background:white;
-}
-.car{
-  position:absolute;
-  bottom:37%;
-  font-size:28px;
-  transition:left 1.8s;
-}
-
 #msgBox{
   position:absolute;
   top:50%;
   left:50%;
-  transform:translate(-50%,-50%);
-  background:rgba(0,0,0,0.85);
-  padding:20px;
+  transform:translate(-50%,-50%) scale(0.8);
+  background:rgba(0,0,0,0.9);
+  padding:25px;
   border-radius:12px;
-  display:none;
+  text-align:center;
+  opacity:0;
+  transition:0.4s;
+}
+#msgBox.show{
+  opacity:1;
+  transform:translate(-50%,-50%) scale(1);
 }
 
 .glow{
@@ -151,20 +131,22 @@ body{
 <div class="overlay">
 <h2 id="quote"></h2>
 <div id="counter" style="font-size:12px;opacity:0.7;"></div>
-<button class="pulse-btn" onclick="goTimeline()">Our Journey 🚗</button>
+<button onclick="goTimeline()">Our Journey 🚗</button>
 </div>
 </div>
 
 <!-- POPUP -->
 <div id="msgBox">
-<p>💖 Every moment you lived… deserves to be felt again…</p>
+<p>
+✨ This is just the beginning…<br><br>
+👉 Tap <b>Our Journey 🚗</b><br>
+to feel every moment again<br><br>
+🎁 Something beautiful awaits at the end ❤️
+</p>
 </div>
 
 <!-- TIMELINE -->
 <div id="timeline" class="screen">
-<div class="road"></div>
-<div id="car" class="car">🚗</div>
-
 <div id="tBlur" class="bg-blur"></div>
 <img id="tImg" class="main-img">
 
@@ -177,29 +159,18 @@ body{
 <!-- FINAL -->
 <div id="final" class="screen">
 <div class="bg-blur" style="background-image:url('images/w9.jpeg')"></div>
-<img src="images/w9.jpeg" class="main-img" style="opacity:1">
+<img src="images/w9.jpeg" class="main-img show">
 
 <div class="overlay">
 <h2 class="glow">❤️ Happy 10th Anniversary ❤️</h2>
 <p id="finalText"></p>
-<button onclick="restart()" style="margin-top:10px;">Replay 🔁</button>
+<button onclick="location.reload()">Replay 🔁</button>
 </div>
 </div>
 
 </div>
 
 <script>
-
-const imgs=["w1.jpeg","w2.jpeg","w3.jpeg","w4.jpeg","w5.jpeg","w6.jpeg","w7.jpeg","w8.jpeg","w9.jpeg","d1.jpeg","d2.jpeg","s1.jpeg"];
-
-function preload(cb){
-let c=0;
-imgs.forEach(s=>{
-let i=new Image();
-i.src="images/"+s;
-i.onload=()=>{c++; if(c===imgs.length) cb();}
-});
-}
 
 const slides=[
 {img:"w1.jpeg",text:"A journey that began with a single promise ❤️"},
@@ -213,56 +184,71 @@ const slides=[
 {img:"w9.jpeg",text:"And forever still continues… 💫"}
 ];
 
+/* 🔥 EMOTIONAL TIMELINE */
 const timeline=[
-{year:"2016 💍",img:"w1.jpeg",text:"A promise… to stand together through everything ❤️"},
-{year:"2020 👶",img:"d1.jpeg",text:"Kundana Priya… a dream that came to life 💖"},
-{year:"2023 👶",img:"d2.jpeg",text:"Gaanavi Priya… another blessing 🌸"},
-{year:"2025 👑",img:"s1.jpeg",text:"Himansh Kaarthikeya Ram 👑 completing their world ❤️"}
+{
+year:"2016 💍",
+img:"w1.jpeg",
+text:"The day two souls promised to walk together…<br>through every joy, every storm… forever ❤️"
+},
+{
+year:"2020 👶",
+img:"d1.jpeg",
+text:"A tiny heartbeat entered their world…<br><b>Kundana Priya</b> 💖<br>turning love into a new life"
+},
+{
+year:"2023 👶",
+img:"d2.jpeg",
+text:"Another blessing arrived…<br><b>Gaanavi Priya</b> 🌸<br>doubling the laughter, filling every corner with joy"
+},
+{
+year:"2025 👑",
+img:"s1.jpeg",
+text:"And then came the little king…<br><b>Himansh Kaarthikeya Ram</b> 👑<br>completing their beautiful world ❤️"
+}
 ];
 
 let i=0,t=0;
 
+/* START */
 document.getElementById("start").onclick=()=>{
-document.getElementById("loadingText").innerText="Loading...";
-preload(()=>{
-document.getElementById("start").remove();
+document.getElementById("start").classList.remove("active");
 document.getElementById("main").classList.add("active");
-hearts(); balloons();
 showSlide();
-});
 };
 
+/* SLIDES */
 function showSlide(){
-let s=slides[i],src="images/"+s.img;
+let s=slides[i];
 let img=document.getElementById("img");
 
-img.style.opacity=0;
+img.classList.remove("show");
 
 setTimeout(()=>{
-img.src=src;
-document.getElementById("blur").style.backgroundImage=`url('${src}')`;
-document.getElementById("quote").innerHTML=s.text;
+img.src="images/"+s.img;
+document.getElementById("blur").style.backgroundImage=`url('images/${s.img}')`;
 
-if(i >= slides.length - 2){
-document.getElementById("quote").innerHTML += "<br><span style='font-size:12px;opacity:0.7'>Ending soon…</span>";
+let text=s.text;
+if(i>=slides.length-2){
+text+="<br><span style='font-size:12px;opacity:0.7'>Ending soon…</span>";
 }
 
-document.getElementById("counter").innerText = (i+1) + " / " + slides.length;
+document.getElementById("quote").innerHTML=text;
+document.getElementById("counter").innerText=(i+1)+" / "+slides.length+" images";
 
-img.style.opacity=1;
-img.classList.add("zoom");
+img.classList.add("show");
 progress();
 },200);
 
+if(i<slides.length-1){
 i++;
-
-if(i<slides.length){
 setTimeout(showSlide,4200);
 }else{
-setTimeout(()=>{ goTimeline(); },2000);
+setTimeout(()=>document.getElementById("msgBox").classList.add("show"),2000);
 }
 }
 
+/* PROGRESS */
 function progress(){
 let b=document.getElementById("progress");
 b.style.transition="none";
@@ -270,57 +256,26 @@ b.style.width="0%";
 setTimeout(()=>{b.style.transition="width 4.2s linear"; b.style.width="100%";},50);
 }
 
-function hearts(){
-setInterval(()=>{
-if(document.querySelectorAll(".heart").length>15) return;
-let h=document.createElement("div");
-h.className="heart";
-h.innerHTML="❤️";
-h.style.left=Math.random()*100+"%";
-document.body.appendChild(h);
-setTimeout(()=>h.remove(),6000);
-},1200);
-}
-
-function balloons(){
-setInterval(()=>{
-if(document.querySelectorAll(".balloon").length>10) return;
-let b=document.createElement("div");
-b.className="balloon";
-b.innerHTML="🎈";
-b.style.left=Math.random()*100+"%";
-document.body.appendChild(b);
-setTimeout(()=>b.remove(),10000);
-},1500);
-}
-
+/* TIMELINE */
 function goTimeline(){
-let msg=document.getElementById("msgBox");
-msg.style.display="block";
-
-setTimeout(()=>{
-msg.style.display="none";
+document.getElementById("msgBox").classList.remove("show");
 document.getElementById("main").classList.remove("active");
 document.getElementById("timeline").classList.add("active");
-t=0; showYear();
-},2000);
+showYear();
 }
 
 function showYear(){
-let d=timeline[t],src="images/"+d.img;
+let d=timeline[t];
 let img=document.getElementById("tImg");
 
-img.style.opacity=0;
+img.classList.remove("show");
 
 setTimeout(()=>{
-img.src=src;
-document.getElementById("tBlur").style.backgroundImage=`url('${src}')`;
-document.getElementById("year").innerHTML=
-`<strong>${d.year}</strong><br><br>${d.text}`;
-img.style.opacity=1;
+img.src="images/"+d.img;
+document.getElementById("tBlur").style.backgroundImage=`url('images/${d.img}')`;
+document.getElementById("year").innerHTML=`<strong>${d.year}</strong><br><br>${d.text}`;
+img.classList.add("show");
 },200);
-
-document.getElementById("car").style.left=(t*30)+"%";
 }
 
 function nextYear(){
@@ -329,31 +284,28 @@ if(t<timeline.length) showYear();
 else showFinal();
 }
 
+/* FINAL */
 function showFinal(){
 document.getElementById("timeline").classList.remove("active");
 document.getElementById("final").classList.add("active");
 
 let msg=[
-"10 years of love… ❤️",
-"A journey of two hearts…",
-"that became a beautiful family 💖",
-"Kundana… Gaanavi… Himansh… 👨‍👩‍👧‍👦",
-"This is not just time…",
-"This is forever ✨"
+"10 years… countless memories ❤️",
+"From two hearts… to a beautiful family 💖",
+"Through every smile, every tear…",
+"You built something eternal ✨",
+"This is not just love…",
+"This is forever ❤️"
 ];
 
 let i=0;
 let el=document.getElementById("finalText");
 
-let interval=setInterval(()=>{
+let inter=setInterval(()=>{
 el.innerHTML+=msg[i]+"<br>";
 i++;
-if(i===msg.length) clearInterval(interval);
+if(i===msg.length) clearInterval(inter);
 },800);
-}
-
-function restart(){
-location.reload();
 }
 
 </script>
