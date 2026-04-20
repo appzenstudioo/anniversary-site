@@ -1,1 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anniversary ❤️</title>
 
+<style>
+body{
+  margin:0;
+  background:black;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  font-family:sans-serif;
+  color:white;
+}
+
+.app{
+  width:100%;
+  max-width:420px;
+  height:100vh;
+}
+
+/* screens */
+.screen{
+  display:none;
+  height:100%;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  text-align:center;
+}
+
+.active{
+  display:flex;
+}
+
+button{
+  padding:12px 25px;
+  border:none;
+  border-radius:20px;
+  background:gold;
+  margin-top:20px;
+}
+
+/* background */
+.bg{
+  width:100%;
+  height:100%;
+  background-size:cover;
+  background-position:center;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* overlay */
+.overlay{
+  background:rgba(0,0,0,0.6);
+  padding:20px;
+  border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- START -->
+<div id="start" class="screen active">
+  <h1>Welcome ❤️</h1>
+  <button onclick="start()">Start</button>
+</div>
+
+<!-- CONTENT -->
+<div id="content" class="screen"></div>
+
+</div>
+
+<script>
+
+const startDate = new Date("2016-04-21");
+let timer;
+
+/* START */
+function start(){
+  document.getElementById("start").classList.remove("active");
+  const content = document.getElementById("content");
+  content.classList.add("active");
+
+  content.innerHTML = `
+    <div class="bg" id="bg">
+      <div class="overlay">
+        <h1>Happy Anniversary 💖</h1>
+        <p id="timer">Loading...</p>
+      </div>
+    </div>
+  `;
+
+  /* SET IMAGE (JPEG) */
+  document.getElementById("bg").style.backgroundImage =
+    "url('images/w1.jpeg')";
+
+  startTimer();
+}
+
+/* TIMER */
+function startTimer(){
+  clearInterval(timer);
+  timer = setInterval(()=>{
+    let diff = new Date() - startDate;
+
+    let s = Math.floor(diff/1000);
+    let m = Math.floor(s/60);
+    let h = Math.floor(m/60);
+    let d = Math.floor(h/24);
+    let w = Math.floor(d/7);
+    let mo = Math.floor(d/30);
+    let y = Math.floor(d/365);
+
+    document.getElementById("timer").innerHTML =
+      `${y} Years | ${mo%12} Months | ${w%4} Weeks<br>
+       ${d%7} Days | ${h%24} H | ${m%60} M | ${s%60} S`;
+  },1000);
+}
+
+</script>
+
+</body>
+</html>
