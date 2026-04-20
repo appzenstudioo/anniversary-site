@@ -8,17 +8,14 @@
 body{
   margin:0;
   background:black;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
   font-family:sans-serif;
+  overflow:hidden;
   color:white;
 }
 
 .app{
-  width:100%;
   max-width:420px;
+  margin:auto;
   height:100vh;
   position:relative;
   overflow:hidden;
@@ -33,23 +30,29 @@ body{
 }
 .active{display:block;}
 
-/* BACKGROUND LAYER (blur) */
+/* image layers */
 .bg-blur{
   position:absolute;
   width:100%;
   height:100%;
   background-size:cover;
   background-position:center;
-  filter:blur(20px) brightness(0.6);
+  filter:blur(25px) brightness(0.6);
   transform:scale(1.1);
+  transition:0.8s;
 }
 
-/* MAIN IMAGE */
 .main-img{
   position:absolute;
   width:100%;
   height:100%;
   object-fit:contain;
+  transition:opacity 1s, transform 6s ease;
+}
+
+/* cinematic zoom */
+.zoom{
+  transform:scale(1.08) translateY(-5px);
 }
 
 /* overlay */
@@ -63,51 +66,92 @@ body{
   padding:15px;
   border-radius:12px;
   text-align:center;
+  backdrop-filter:blur(6px);
 }
 
-/* button */
-button{
-  padding:10px 20px;
-  border:none;
-  border-radius:20px;
+/* progress bar */
+.progress{
+  position:absolute;
+  top:0;
+  left:0;
+  height:4px;
+  background:white;
+  width:0%;
+}
+
+/* hearts */
+.heart{
+  position:absolute;
+  font-size:18px;
+  animation:float 6s linear;
+}
+@keyframes float{
+  from{transform:translateY(100vh);}
+  to{transform:translateY(-10vh);}
+}
+
+/* road timeline */
+.road{
+  position:absolute;
+  bottom:40%;
+  width:100%;
+  height:6px;
+  background:white;
+}
+
+.car{
+  position:absolute;
+  bottom:38%;
+  font-size:28px;
+  transition:left 1.5s ease;
+}
+
+/* confetti */
+.confetti{
+  position:absolute;
+  width:6px;
+  height:6px;
   background:gold;
-  margin-top:10px;
+  animation:fall 4s linear;
 }
-
-h1,h2,p{margin:5px 0;}
+@keyframes fall{
+  to{transform:translateY(100vh);}
+}
 </style>
 </head>
 
 <body>
 
-<div class="app">
+<div class="app" onclick="nextSlide()">
+
+<div class="progress" id="progress"></div>
 
 <!-- START -->
 <div id="start" class="screen active" style="display:flex;justify-content:center;align-items:center;flex-direction:column;">
-  <h1>Welcome ❤️</h1>
-  <button onclick="start()">Start</button>
+  <h1>❤️ Welcome ❤️</h1>
+  <p>Tap to Begin</p>
 </div>
 
 <!-- MAIN -->
 <div id="main" class="screen">
-  <div id="mainBlur" class="bg-blur"></div>
-  <img id="mainImg" class="main-img">
-
+  <div id="blur" class="bg-blur"></div>
+  <img id="img" class="main-img">
   <div class="overlay">
-    <h2>Happy Anniversary 💖</h2>
-    <p id="timer"></p>
-    <button onclick="openTimeline()">Timeline 👶</button>
+    <h2 id="quote"></h2>
   </div>
 </div>
 
 <!-- TIMELINE -->
 <div id="timeline" class="screen">
-  <div id="timelineBlur" class="bg-blur"></div>
-  <img id="timelineImg" class="main-img">
+  <div class="road"></div>
+  <div id="car" class="car">🚗</div>
+
+  <div id="tBlur" class="bg-blur"></div>
+  <img id="tImg" class="main-img">
 
   <div class="overlay">
-    <h2>Our Family 💖</h2>
-    <button onclick="back()">Back</button>
+    <h3 id="year"></h3>
+    <p>Tap to continue →</p>
   </div>
 </div>
 
@@ -115,94 +159,156 @@ h1,h2,p{margin:5px 0;}
 
 <script>
 
-const startDate = new Date("2016-04-21T00:00:00+05:30");
+/* SLIDES */
+const slides = [
+  {img:"w1.jpeg", text:"The day everything began ❤️"},
+  {img:"w2.jpeg", text:"Two hearts, one promise 💖"},
+  {img:"w3.jpeg", text:"A journey of love ✨"},
+  {img:"w4.jpeg", text:"Smiles that last forever 😊"},
+  {img:"w5.jpeg", text:"Moments turned memories 🌸"},
+  {img:"w6.jpeg", text:"Together through everything 🤝"},
+  {img:"w7.jpeg", text:"Love growing every day 💞"},
+  {img:"w8.jpeg", text:"Still falling in love ❤️"},
+  {img:"w9.jpeg", text:"Forever begins again 💫"}
+];
 
-let slideIndex = 0;
-let kidIndex = 0;
-let timer;
+/* TIMELINE */
+const timeline = [
+  {year:"2016 💍", img:"w1.jpeg"},
+  {year:"2020 👶", img:"d1.jpeg"},
+  {year:"2023 👶", img:"d2.jpeg"},
+  {year:"2025 👑", img:"s1.jpeg"}
+];
 
-const slides = ["w1.jpeg","w2.jpeg","w3.jpeg","w5.jpeg","w6.jpeg,"w7.jpeg","w8.jpeg",w9.jpeg"];
-const kids = ["d1.jpeg","d2.jpeg","s1.jpeg"];
+let i=0, mode="start", t=0;
+
+/* TAP */
+function nextSlide(){
+
+  if(mode==="start"){
+    start();
+    return;
+  }
+
+  if(mode==="main"){
+    i++;
+    if(i < slides.length){
+      showSlide();
+    }else{
+      mode="timeline";
+      document.getElementById("main").classList.remove("active");
+      document.getElementById("timeline").classList.add("active");
+      showYear();
+    }
+  }
+
+  else if(mode==="timeline"){
+    t++;
+    if(t < timeline.length){
+      showYear();
+    }else{
+      finalScene();
+    }
+  }
+}
 
 /* START */
 function start(){
   document.getElementById("start").classList.remove("active");
   document.getElementById("main").classList.add("active");
+  mode="main";
 
-  showSlides();
-  startTimer();
+  hearts();
+  showSlide();
 }
 
-/* MAIN SLIDES */
-function showSlides(){
+/* SLIDE SHOW */
+function showSlide(){
 
-  const img = document.getElementById("mainImg");
-  const blur = document.getElementById("mainBlur");
+  let s = slides[i];
+  let src = "images/" + s.img;
 
-  let src = "images/" + slides[slideIndex];
+  let img = document.getElementById("img");
+  let blur = document.getElementById("blur");
 
-  img.src = src;
-  blur.style.backgroundImage = "url('" + src + "')";
+  img.style.opacity = 0;
 
-  slideIndex++;
+  setTimeout(()=>{
+    img.src = src;
+    blur.style.backgroundImage = `url('${src}')`;
+    document.getElementById("quote").innerText = s.text;
 
-  if(slideIndex < slides.length){
-    setTimeout(showSlides, 4000);
-  }
+    img.style.opacity = 1;
+    img.classList.add("zoom");
+
+    progress();
+  },300);
+
+  clearTimeout(window.auto);
+  window.auto = setTimeout(nextSlide, 4500);
 }
 
-/* TIMER */
-function startTimer(){
-  clearInterval(timer);
+/* PROGRESS */
+function progress(){
+  let bar = document.getElementById("progress");
+  bar.style.transition = "none";
+  bar.style.width = "0%";
 
-  timer = setInterval(()=>{
-    let diff = new Date() - startDate;
+  setTimeout(()=>{
+    bar.style.transition = "width 4.5s linear";
+    bar.style.width = "100%";
+  },50);
+}
 
-    let s = Math.floor(diff/1000);
-    let m = Math.floor(s/60);
-    let h = Math.floor(m/60);
-    let d = Math.floor(h/24);
-    let w = Math.floor(d/7);
-    let mo = Math.floor(d/30);
-    let y = Math.floor(d/365);
-
-    document.getElementById("timer").innerHTML =
-      `${y} Years | ${mo%12} Months | ${w%4} Weeks<br>
-       ${d%7} Days | ${h%24} H | ${m%60} M | ${s%60} S`;
-  },1000);
+/* HEARTS */
+function hearts(){
+  setInterval(()=>{
+    let h = document.createElement("div");
+    h.className="heart";
+    h.innerHTML="❤️";
+    h.style.left=Math.random()*100+"%";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),6000);
+  },900);
 }
 
 /* TIMELINE */
-function openTimeline(){
-  document.getElementById("main").classList.remove("active");
-  document.getElementById("timeline").classList.add("active");
+function showYear(){
 
-  kidIndex = 0;
-  showKids();
+  let data = timeline[t];
+  let src = "images/" + data.img;
+
+  document.getElementById("tImg").src = src;
+  document.getElementById("tBlur").style.backgroundImage = `url('${src}')`;
+  document.getElementById("year").innerText = data.year;
+
+  document.getElementById("car").style.left = (t*25)+"%";
 }
 
-/* KIDS */
-function showKids(){
+/* FINAL */
+function finalScene(){
 
-  const img = document.getElementById("timelineImg");
-  const blur = document.getElementById("timelineBlur");
+  document.getElementById("timeline").innerHTML = `
+    <div class="bg-blur" style="background-image:url('images/w9.jpeg')"></div>
+    <img src="images/w9.jpeg" class="main-img">
+    <div class="overlay">
+      <h2>❤️ 10 Years of Love ❤️</h2>
+      <p>
+        A journey filled with memories,<br>
+        laughter, and endless love.<br><br>
+        Happy Anniversary 💖
+      </p>
+    </div>
+  `;
 
-  let src = "images/" + kids[kidIndex];
-
-  img.src = src;
-  blur.style.backgroundImage = "url('" + src + "')";
-
-  kidIndex++;
-
-  if(kidIndex < kids.length){
-    setTimeout(showKids, 3000);
+  /* confetti */
+  for(let i=0;i<80;i++){
+    let c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*100+"%";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),4000);
   }
-}
-
-/* BACK */
-function back(){
-  document.getElementById("timeline").classList.remove("active");
-  document.getElementById("main").classList.add("active");
 }
 
 </script>
