@@ -2,7 +2,6 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Anniversary ❤️</title>
 
 <style>
 body{
@@ -18,7 +17,6 @@ body{
   margin:auto;
   height:100vh;
   position:relative;
-  overflow:hidden;
 }
 
 /* screens */
@@ -30,29 +28,22 @@ body{
 }
 .active{display:block;}
 
-/* image layers */
-.bg-blur{
-  position:absolute;
-  width:100%;
-  height:100%;
-  background-size:cover;
-  background-position:center;
-  filter:blur(25px) brightness(0.6);
-  transform:scale(1.1);
-  transition:0.8s;
-}
-
+/* image */
 .main-img{
   position:absolute;
   width:100%;
   height:100%;
   object-fit:contain;
-  transition:opacity 1s, transform 6s ease;
+  transition:opacity 0.8s;
 }
 
-/* cinematic zoom */
-.zoom{
-  transform:scale(1.08) translateY(-5px);
+/* blur */
+.bg-blur{
+  position:absolute;
+  width:100%;
+  height:100%;
+  background-size:cover;
+  filter:blur(25px) brightness(0.6);
 }
 
 /* overlay */
@@ -66,23 +57,20 @@ body{
   padding:15px;
   border-radius:12px;
   text-align:center;
-  backdrop-filter:blur(6px);
 }
 
-/* progress bar */
+/* progress */
 .progress{
   position:absolute;
   top:0;
-  left:0;
   height:4px;
   background:white;
   width:0%;
 }
 
-/* hearts */
+/* ❤️ hearts */
 .heart{
   position:absolute;
-  font-size:18px;
   animation:float 6s linear;
 }
 @keyframes float{
@@ -90,7 +78,7 @@ body{
   to{transform:translateY(-10vh);}
 }
 
-/* road timeline */
+/* 🚗 ROAD */
 .road{
   position:absolute;
   bottom:40%;
@@ -101,48 +89,40 @@ body{
 
 .car{
   position:absolute;
-  bottom:38%;
+  bottom:37%;
   font-size:28px;
-  transition:left 1.5s ease;
-}
-
-/* confetti */
-.confetti{
-  position:absolute;
-  width:6px;
-  height:6px;
-  background:gold;
-  animation:fall 4s linear;
-}
-@keyframes fall{
-  to{transform:translateY(100vh);}
+  left:0%;
+  transition:left 2s ease-in-out; /* 🔥 smooth drive */
 }
 </style>
 </head>
 
 <body>
 
-<div class="app" onclick="nextSlide()">
+<div class="app">
 
-<div class="progress" id="progress"></div>
+<div id="progress" class="progress"></div>
 
 <!-- START -->
 <div id="start" class="screen active" style="display:flex;justify-content:center;align-items:center;flex-direction:column;">
   <h1>❤️ Welcome ❤️</h1>
-  <p>Tap to Begin</p>
+  <button onclick="start()">Start</button>
 </div>
 
 <!-- MAIN -->
 <div id="main" class="screen">
   <div id="blur" class="bg-blur"></div>
   <img id="img" class="main-img">
+
   <div class="overlay">
     <h2 id="quote"></h2>
+    <button onclick="goTimeline()">Timeline 🚗</button>
   </div>
 </div>
 
 <!-- TIMELINE -->
 <div id="timeline" class="screen">
+
   <div class="road"></div>
   <div id="car" class="car">🚗</div>
 
@@ -151,8 +131,9 @@ body{
 
   <div class="overlay">
     <h3 id="year"></h3>
-    <p>Tap to continue →</p>
+    <button onclick="nextYear()">Next ➡️</button>
   </div>
+
 </div>
 
 </div>
@@ -162,13 +143,13 @@ body{
 /* SLIDES */
 const slides = [
   {img:"w1.jpeg", text:"The day everything began ❤️"},
-  {img:"w2.jpeg", text:"Two hearts, one promise 💖"},
-  {img:"w3.jpeg", text:"A journey of love ✨"},
-  {img:"w4.jpeg", text:"Smiles that last forever 😊"},
-  {img:"w5.jpeg", text:"Moments turned memories 🌸"},
+  {img:"w2.jpeg", text:"Two hearts, one journey 💖"},
+  {img:"w3.jpeg", text:"Love growing stronger 🌸"},
+  {img:"w4.jpeg", text:"Memories forever ✨"},
+  {img:"w5.jpeg", text:"Moments of happiness 💞"},
   {img:"w6.jpeg", text:"Together through everything 🤝"},
-  {img:"w7.jpeg", text:"Love growing every day 💞"},
-  {img:"w8.jpeg", text:"Still falling in love ❤️"},
+  {img:"w7.jpeg", text:"Still smiling together 😊"},
+  {img:"w8.jpeg", text:"Still in love ❤️"},
   {img:"w9.jpeg", text:"Forever begins again 💫"}
 ];
 
@@ -180,99 +161,69 @@ const timeline = [
   {year:"2025 👑", img:"s1.jpeg"}
 ];
 
-let i=0, mode="start", t=0;
-
-/* TAP */
-function nextSlide(){
-
-  if(mode==="start"){
-    start();
-    return;
-  }
-
-  if(mode==="main"){
-    i++;
-    if(i < slides.length){
-      showSlide();
-    }else{
-      mode="timeline";
-      document.getElementById("main").classList.remove("active");
-      document.getElementById("timeline").classList.add("active");
-      showYear();
-    }
-  }
-
-  else if(mode==="timeline"){
-    t++;
-    if(t < timeline.length){
-      showYear();
-    }else{
-      finalScene();
-    }
-  }
-}
+let i=0, t=0;
 
 /* START */
 function start(){
   document.getElementById("start").classList.remove("active");
   document.getElementById("main").classList.add("active");
-  mode="main";
 
   hearts();
   showSlide();
 }
 
-/* SLIDE SHOW */
+/* SLIDES */
 function showSlide(){
 
   let s = slides[i];
   let src = "images/" + s.img;
 
-  let img = document.getElementById("img");
-  let blur = document.getElementById("blur");
+  document.getElementById("img").src = src;
+  document.getElementById("blur").style.backgroundImage = `url('${src}')`;
+  document.getElementById("quote").innerText = s.text;
 
-  img.style.opacity = 0;
+  progress();
 
-  setTimeout(()=>{
-    img.src = src;
-    blur.style.backgroundImage = `url('${src}')`;
-    document.getElementById("quote").innerText = s.text;
+  i++;
 
-    img.style.opacity = 1;
-    img.classList.add("zoom");
-
-    progress();
-  },300);
-
-  clearTimeout(window.auto);
-  window.auto = setTimeout(nextSlide, 4500);
+  if(i < slides.length){
+    setTimeout(showSlide, 4000);
+  }
 }
 
 /* PROGRESS */
 function progress(){
   let bar = document.getElementById("progress");
-  bar.style.transition = "none";
   bar.style.width = "0%";
 
   setTimeout(()=>{
-    bar.style.transition = "width 4.5s linear";
-    bar.style.width = "100%";
+    bar.style.transition="width 4s linear";
+    bar.style.width="100%";
   },50);
 }
 
-/* HEARTS */
+/* ❤️ HEARTS */
 function hearts(){
   setInterval(()=>{
-    let h = document.createElement("div");
+    let h=document.createElement("div");
     h.className="heart";
     h.innerHTML="❤️";
     h.style.left=Math.random()*100+"%";
     document.body.appendChild(h);
     setTimeout(()=>h.remove(),6000);
-  },900);
+  },800);
 }
 
-/* TIMELINE */
+/* GO TIMELINE */
+function goTimeline(){
+  document.getElementById("main").classList.remove("active");
+  document.getElementById("timeline").classList.add("active");
+
+  t=0;
+  showYear();
+}
+
+/* SHOW YEAR */
 function showYear(){
 
   let data = timeline[t];
@@ -282,32 +233,15 @@ function showYear(){
   document.getElementById("tBlur").style.backgroundImage = `url('${src}')`;
   document.getElementById("year").innerText = data.year;
 
-  document.getElementById("car").style.left = (t*25)+"%";
+  /* 🚗 SMOOTH CAR DRIVE */
+  document.getElementById("car").style.left = (t * 30) + "%";
 }
 
-/* FINAL */
-function finalScene(){
-
-  document.getElementById("timeline").innerHTML = `
-    <div class="bg-blur" style="background-image:url('images/w9.jpeg')"></div>
-    <img src="images/w9.jpeg" class="main-img">
-    <div class="overlay">
-      <h2>❤️ 10 Years of Love ❤️</h2>
-      <p>
-        A journey filled with memories,<br>
-        laughter, and endless love.<br><br>
-        Happy Anniversary 💖
-      </p>
-    </div>
-  `;
-
-  /* confetti */
-  for(let i=0;i<80;i++){
-    let c=document.createElement("div");
-    c.className="confetti";
-    c.style.left=Math.random()*100+"%";
-    document.body.appendChild(c);
-    setTimeout(()=>c.remove(),4000);
+/* NEXT */
+function nextYear(){
+  t++;
+  if(t < timeline.length){
+    showYear();
   }
 }
 
