@@ -3,6 +3,8 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<link rel="preload" as="image" href="images/w1.jpeg">
+
 <style>
 body{
   margin:0;
@@ -35,7 +37,8 @@ body{
   height:100%;
   object-fit:contain;
   opacity:0;
-  transition:opacity 1s ease, transform 6s ease;
+  transition:opacity 0.8s ease, transform 6s ease;
+  will-change: transform, opacity;
 }
 .zoom{ transform:scale(1.08); }
 
@@ -61,6 +64,7 @@ body{
   padding:15px;
   border-radius:12px;
   text-align:center;
+  backdrop-filter:blur(6px);
 }
 
 /* progress */
@@ -72,15 +76,27 @@ body{
   width:0%;
 }
 
-/* hearts */
+/* ❤️ hearts */
 .heart{
   position:absolute;
-  font-size:18px;
-  animation:float 6s linear;
+  font-size:16px;
+  animation:floatUp 6s linear;
 }
-@keyframes float{
+@keyframes floatUp{
   from{transform:translateY(100vh);}
   to{transform:translateY(-10vh);}
+}
+
+/* 🎈 balloons */
+.balloon{
+  position:absolute;
+  font-size:22px;
+  animation:balloonFloat 10s linear;
+  opacity:0.9;
+}
+@keyframes balloonFloat{
+  0%{transform:translateY(100vh) scale(0.8);}
+  100%{transform:translateY(-20vh) scale(1.1);}
 }
 
 /* timeline */
@@ -99,6 +115,30 @@ body{
   left:0%;
   transition:left 1.8s ease-in-out;
 }
+
+/* ✨ FINAL GLOW TEXT */
+.glow{
+  animation:glowPulse 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes glowPulse{
+  from{
+    text-shadow:0 0 5px #fff, 0 0 10px #ff4d6d, 0 0 15px #ff4d6d;
+  }
+  to{
+    text-shadow:0 0 15px #fff, 0 0 25px #ff4d6d, 0 0 35px #ff4d6d;
+  }
+}
+
+/* final fade */
+.fade-in{
+  animation:fadeIn 2s ease forwards;
+}
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(20px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
 </style>
 </head>
 
@@ -111,7 +151,7 @@ body{
 <!-- START -->
 <div id="start" class="screen active" style="display:flex;justify-content:center;align-items:center;flex-direction:column;">
   <h1>❤️ Welcome ❤️</h1>
-  <p>Tap to Begin</p>
+  <p id="loadingText">Tap to Begin</p>
 </div>
 
 <!-- MAIN -->
@@ -146,8 +186,8 @@ body{
   <div class="bg-blur" style="background-image:url('images/w9.jpeg')"></div>
   <img src="images/w9.jpeg" class="main-img" style="opacity:1">
 
-  <div class="overlay">
-    <h2>❤️ Happy 10th Anniversary ❤️</h2>
+  <div class="overlay fade-in">
+    <h2 class="glow">❤️ Happy 10th Anniversary ❤️</h2>
     <p>
       10 years of love… ❤️<br>
       A journey that began with two hearts<br>
@@ -168,145 +208,137 @@ body{
 
 <script>
 
+/* PRELOAD */
+const allImages=[
+"w1.jpeg","w2.jpeg","w3.jpeg","w4.jpeg","w5.jpeg",
+"w6.jpeg","w7.jpeg","w8.jpeg","w9.jpeg",
+"d1.jpeg","d2.jpeg","s1.jpeg"
+];
+
+function preloadImages(cb){
+let l=0;
+allImages.forEach(s=>{
+let i=new Image();
+i.src="images/"+s;
+i.onload=()=>{l++; if(l===allImages.length) cb();}
+});
+}
+
 /* SLIDES */
-const slides = [
-  {img:"w1.jpeg", text:"The day everything began ❤️"},
-  {img:"w2.jpeg", text:"Two hearts, one promise 💖"},
-  {img:"w3.jpeg", text:"A journey of love ✨"},
-  {img:"w4.jpeg", text:"Smiles that never fade 😊"},
-  {img:"w5.jpeg", text:"Memories forever 🌸"},
-  {img:"w6.jpeg", text:"Together through everything 🤝"},
-  {img:"w7.jpeg", text:"Love growing stronger 💞"},
-  {img:"w8.jpeg", text:"Still falling in love ❤️"},
-  {img:"w9.jpeg", text:"Forever begins again 💫"}
+const slides=[
+{img:"w1.jpeg",text:"The day everything began ❤️"},
+{img:"w2.jpeg",text:"Two hearts, one promise 💖"},
+{img:"w3.jpeg",text:"A journey of love ✨"},
+{img:"w4.jpeg",text:"Smiles that never fade 😊"},
+{img:"w5.jpeg",text:"Memories forever 🌸"},
+{img:"w6.jpeg",text:"Together through everything 🤝"},
+{img:"w7.jpeg",text:"Love growing stronger 💞"},
+{img:"w8.jpeg",text:"Still falling in love ❤️"},
+{img:"w9.jpeg",text:"Forever begins again 💫"}
 ];
 
-/* TIMELINE (EMOTIONAL) */
-const timeline = [
-  {
-    year:"2016 💍",
-    img:"w1.jpeg",
-    text:"Two souls became one…<br>A promise that started a beautiful journey ❤️"
-  },
-  {
-    year:"2020 👶",
-    img:"d1.jpeg",
-    text:"Their love found a new form…<br>Kundana Priya was born 💖<br>A little princess who filled their lives with joy ✨"
-  },
-  {
-    year:"2023 👶",
-    img:"d2.jpeg",
-    text:"Happiness doubled…<br>Gaanavi Priya arrived 🌸<br>Another blessing, another reason to smile 😊"
-  },
-  {
-    year:"2025 👑",
-    img:"s1.jpeg",
-    text:"The family became complete…<br>King Himansh Kaarthikeya Ram 👑<br>A little prince, a lifetime of happiness 💞"
-  }
+const timeline=[
+{year:"2016 💍",img:"w1.jpeg",text:"Two souls became one…<br>A promise began ❤️"},
+{year:"2020 👶",img:"d1.jpeg",text:"Kundana Priya was born 💖"},
+{year:"2023 👶",img:"d2.jpeg",text:"Gaanavi Priya arrived 🌸"},
+{year:"2025 👑",img:"s1.jpeg",text:"Himansh Kaarthikeya Ram 👑"}
 ];
 
-let i=0, t=0;
+let i=0,t=0;
 
 /* START */
-document.getElementById("start").onclick = ()=>{
-  document.getElementById("start").classList.remove("active");
-  document.getElementById("main").classList.add("active");
-  hearts();
-  showSlide();
+document.getElementById("start").onclick=()=>{
+document.getElementById("loadingText").innerText="Loading memories...";
+preloadImages(()=>{
+document.getElementById("start").remove();
+document.getElementById("main").classList.add("active");
+hearts();
+balloons();
+showSlide();
+});
 };
 
 /* SLIDES */
 function showSlide(){
+let s=slides[i],src="images/"+s.img;
+let img=document.getElementById("img");
+img.style.opacity=0;
 
-  let s = slides[i];
-  let src = "images/" + s.img;
+setTimeout(()=>{
+img.src=src;
+document.getElementById("blur").style.backgroundImage=`url('${src}')`;
+document.getElementById("quote").innerText=s.text;
+img.style.opacity=1;
+img.classList.add("zoom");
+progress();
+},200);
 
-  let img = document.getElementById("img");
-
-  img.classList.remove("zoom");
-  img.style.opacity = 0;
-
-  setTimeout(()=>{
-    img.src = src;
-    document.getElementById("blur").style.backgroundImage = `url('${src}')`;
-    document.getElementById("quote").innerText = s.text;
-
-    img.style.opacity = 1;
-    img.classList.add("zoom");
-
-    progress();
-  },300);
-
-  i++;
-
-  if(i < slides.length){
-    setTimeout(showSlide, 4500);
-  }
+i++;
+if(i<slides.length) setTimeout(showSlide,4200);
 }
 
 /* PROGRESS */
 function progress(){
-  let bar = document.getElementById("progress");
-  bar.style.transition="none";
-  bar.style.width="0%";
-
-  setTimeout(()=>{
-    bar.style.transition="width 4.5s linear";
-    bar.style.width="100%";
-  },50);
+let b=document.getElementById("progress");
+b.style.transition="none"; b.style.width="0%";
+setTimeout(()=>{b.style.transition="width 4.2s linear"; b.style.width="100%";},50);
 }
 
 /* HEARTS */
 function hearts(){
-  setInterval(()=>{
-    let h=document.createElement("div");
-    h.className="heart";
-    h.innerHTML="❤️";
-    h.style.left=Math.random()*100+"%";
-    document.body.appendChild(h);
-    setTimeout(()=>h.remove(),6000);
-  },1000);
+setInterval(()=>{
+if(document.querySelectorAll(".heart").length>15) return;
+let h=document.createElement("div");
+h.className="heart";
+h.innerHTML="❤️";
+h.style.left=Math.random()*100+"%";
+document.body.appendChild(h);
+setTimeout(()=>h.remove(),6000);
+},1200);
+}
+
+/* BALLOONS */
+function balloons(){
+setInterval(()=>{
+if(document.querySelectorAll(".balloon").length>10) return;
+let b=document.createElement("div");
+b.className="balloon";
+b.innerHTML=["🎈","💖","💕"][Math.floor(Math.random()*3)];
+b.style.left=Math.random()*100+"%";
+document.body.appendChild(b);
+setTimeout(()=>b.remove(),10000);
+},1500);
 }
 
 /* TIMELINE */
 function goTimeline(){
-  document.getElementById("main").classList.remove("active");
-  document.getElementById("timeline").classList.add("active");
-  t=0;
-  showYear();
+document.getElementById("main").classList.remove("active");
+document.getElementById("timeline").classList.add("active");
+t=0; showYear();
 }
 
 function showYear(){
+let d=timeline[t],src="images/"+d.img;
+let img=document.getElementById("tImg");
+img.style.opacity=0;
 
-  let data = timeline[t];
-  let src = "images/" + data.img;
+setTimeout(()=>{
+img.src=src;
+document.getElementById("tBlur").style.backgroundImage=`url('${src}')`;
+document.getElementById("year").innerHTML=`<strong>${d.year}</strong><br><br>${d.text}`;
+img.style.opacity=1;
+},200);
 
-  let img = document.getElementById("tImg");
-
-  img.style.opacity = 0;
-
-  setTimeout(()=>{
-    img.src = src;
-    document.getElementById("tBlur").style.backgroundImage = `url('${src}')`;
-
-    document.getElementById("year").innerHTML =
-      `<strong>${data.year}</strong><br><br>${data.text}`;
-
-    img.style.opacity = 1;
-  },300);
-
-  document.getElementById("car").style.left = (t * 30) + "%";
+document.getElementById("car").style.left=(t*30)+"%";
 }
 
-/* NEXT */
 function nextYear(){
-  t++;
-  if(t < timeline.length){
-    showYear();
-  } else {
-    document.getElementById("timeline").classList.remove("active");
-    document.getElementById("final").classList.add("active");
-  }
+t++;
+if(t<timeline.length) showYear();
+else{
+document.getElementById("timeline").classList.remove("active");
+document.getElementById("final").classList.add("active");
+}
 }
 
 </script>
