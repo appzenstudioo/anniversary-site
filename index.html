@@ -32,13 +32,20 @@ body{
 }
 .active{display:block;}
 
-/* background */
+/* image container */
 .bg{
   width:100%;
   height:100%;
-  background-size:cover;
-  background-position:center;
-  transition:background-image 0.8s ease-in-out;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:black;
+}
+
+.bg img{
+  width:100%;
+  height:100%;
+  object-fit:contain; /* 🔥 no cutting */
 }
 
 /* bottom overlay */
@@ -62,6 +69,10 @@ button{
   background:gold;
   margin-top:10px;
 }
+
+h1,h2,p{
+  margin:5px 0;
+}
 </style>
 </head>
 
@@ -77,7 +88,9 @@ button{
 
 <!-- MAIN -->
 <div id="main" class="screen">
-  <div class="bg" id="mainBg"></div>
+  <div class="bg">
+    <img id="mainImg">
+  </div>
 
   <div class="overlay">
     <h2>Happy Anniversary 💖</h2>
@@ -88,7 +101,9 @@ button{
 
 <!-- TIMELINE -->
 <div id="timeline" class="screen">
-  <div class="bg" id="timelineBg"></div>
+  <div class="bg">
+    <img id="timelineImg">
+  </div>
 
   <div class="overlay">
     <h2>Our Family 💖</h2>
@@ -118,12 +133,11 @@ function start(){
   startTimer();
 }
 
-/* MAIN SLIDES (NO REFRESH) */
+/* MAIN SLIDES */
 function showSlides(){
-  const bg = document.getElementById("mainBg");
+  const img = document.getElementById("mainImg");
 
-  bg.style.backgroundImage =
-    "url('images/" + slides[slideIndex] + "')";
+  img.src = "images/" + slides[slideIndex];
 
   slideIndex++;
 
@@ -135,6 +149,7 @@ function showSlides(){
 /* TIMER */
 function startTimer(){
   clearInterval(timer);
+
   timer = setInterval(()=>{
     let diff = new Date() - startDate;
 
@@ -147,12 +162,12 @@ function startTimer(){
     let y = Math.floor(d/365);
 
     document.getElementById("timer").innerHTML =
-      `${y}Y | ${mo%12}M | ${w%4}W<br>
-       ${d%7}D | ${h%24}H | ${m%60}M | ${s%60}S`;
+      `${y} Years | ${mo%12} Months | ${w%4} Weeks<br>
+       ${d%7} Days | ${h%24} H | ${m%60} M | ${s%60} S`;
   },1000);
 }
 
-/* TIMELINE */
+/* OPEN TIMELINE */
 function openTimeline(){
   document.getElementById("main").classList.remove("active");
   document.getElementById("timeline").classList.add("active");
@@ -161,12 +176,11 @@ function openTimeline(){
   showKids();
 }
 
-/* KIDS SLIDES (NO REFRESH) */
+/* KIDS SLIDES */
 function showKids(){
-  const bg = document.getElementById("timelineBg");
+  const img = document.getElementById("timelineImg");
 
-  bg.style.backgroundImage =
-    "url('images/" + kids[kidIndex] + "')";
+  img.src = "images/" + kids[kidIndex];
 
   kidIndex++;
 
