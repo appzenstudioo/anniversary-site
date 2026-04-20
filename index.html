@@ -33,7 +33,7 @@ body{
   pointer-events:auto;
 }
 
-/* DOUBLE IMAGE LAYER */
+/* double image */
 .main-img{
   position:absolute;
   width:100%;
@@ -43,13 +43,12 @@ body{
   transform:scale(1);
   transition:opacity 1s ease, transform 6s ease;
 }
-
 .active-img{
   opacity:1;
   transform:scale(1.08);
 }
 
-/* blur bg */
+/* blur */
 .bg-blur{
   position:absolute;
   width:100%;
@@ -58,7 +57,6 @@ body{
   background-position:center;
   filter:blur(25px) brightness(0.6);
   transform:scale(1.1);
-  transition:background-image 0.8s ease;
 }
 
 /* overlay */
@@ -118,6 +116,28 @@ button{
   from{text-shadow:0 0 5px #fff;}
   to{text-shadow:0 0 25px #ff4d6d;}
 }
+
+/* ❤️ hearts */
+.heart{
+  position:absolute;
+  font-size:18px;
+  animation:floatUp 6s linear;
+}
+@keyframes floatUp{
+  from{transform:translateY(100vh);}
+  to{transform:translateY(-10vh);}
+}
+
+/* 🎈 balloons */
+.balloon{
+  position:absolute;
+  font-size:22px;
+  animation:balloonUp 10s linear;
+}
+@keyframes balloonUp{
+  from{transform:translateY(100vh);}
+  to{transform:translateY(-20vh);}
+}
 </style>
 </head>
 
@@ -137,7 +157,6 @@ button{
 <div id="main" class="screen">
 <div id="blur" class="bg-blur"></div>
 
-<!-- DOUBLE IMAGES -->
 <img id="img1" class="main-img active-img">
 <img id="img2" class="main-img">
 
@@ -185,7 +204,6 @@ to relive every moment<br><br>
 
 <script>
 
-/* slides */
 const slides=[
 {img:"w1.jpeg",text:"A journey that began with a single promise ❤️"},
 {img:"w2.jpeg",text:"Two hearts… choosing each other every day 💖"},
@@ -198,7 +216,6 @@ const slides=[
 {img:"w9.jpeg",text:"And forever still continues… 💫"}
 ];
 
-/* emotional timeline */
 const timeline=[
 {
 year:"2016 💍",
@@ -208,63 +225,59 @@ text:"The day two souls promised forever… ❤️"
 {
 year:"2020 👶",
 img:"d1.jpeg",
-text:"A new heartbeat… Kundana Priya 💖<br>filled life with meaning"
+text:"Kundana Priya 💖 — a new heartbeat of love"
 },
 {
 year:"2023 👶",
 img:"d2.jpeg",
-text:"Another blessing… Gaanavi Priya 🌸<br>more laughter, more love"
+text:"Gaanavi Priya 🌸 — more joy, more laughter"
 },
 {
 year:"2025 👑",
 img:"s1.jpeg",
-text:"A little king… Himansh 👑<br>completed their world ❤️"
+text:"Himansh 👑 — completing a perfect family ❤️"
 }
 ];
 
-let i=0, t=0;
-let currentImg = 1;
+let i=0,t=0,currentImg=1;
 
 /* start */
 document.getElementById("start").onclick=()=>{
 switchScreen("start","main");
+hearts();
+balloons();
 showSlide();
 };
 
-/* screen switch */
 function switchScreen(a,b){
 document.getElementById(a).classList.remove("active");
 document.getElementById(b).classList.add("active");
 }
 
-/* SLIDES (NO FLICKER) */
+/* slideshow */
 function showSlide(){
 
-let s = slides[i];
-let src = "images/"+s.img;
+let s=slides[i];
+let src="images/"+s.img;
 
-let img1 = document.getElementById("img1");
-let img2 = document.getElementById("img2");
+let img1=document.getElementById("img1");
+let img2=document.getElementById("img2");
 
-let active = currentImg===1 ? img1 : img2;
-let next   = currentImg===1 ? img2 : img1;
+let active=currentImg===1?img1:img2;
+let next=currentImg===1?img2:img1;
 
-/* preload before showing */
-let temp = new Image();
-temp.src = src;
-temp.onload = ()=>{
+let temp=new Image();
+temp.src=src;
+temp.onload=()=>{
 
-next.src = src;
+next.src=src;
 
-/* crossfade */
 setTimeout(()=>{
 next.classList.add("active-img");
 active.classList.remove("active-img");
 
-/* update blur */
 document.getElementById("blur").style.backgroundImage=`url('${src}')`;
 
-/* text */
 let text=s.text;
 if(i>=slides.length-2){
 text+="<br><span style='font-size:12px;opacity:0.7'>Ending soon…</span>";
@@ -279,17 +292,14 @@ progress();
 
 };
 
-/* switch buffer */
-currentImg = currentImg===1 ? 2 : 1;
+currentImg=currentImg===1?2:1;
 
-/* next */
-if(i < slides.length-1){
+if(i<slides.length-1){
 i++;
 setTimeout(showSlide,4200);
 }else{
 setTimeout(()=>document.getElementById("msgBox").classList.add("show"),2000);
 }
-
 }
 
 /* progress */
@@ -298,6 +308,31 @@ let b=document.getElementById("progress");
 b.style.transition="none";
 b.style.width="0%";
 setTimeout(()=>{b.style.transition="width 4.2s linear"; b.style.width="100%";},50);
+}
+
+/* effects */
+function hearts(){
+setInterval(()=>{
+if(document.querySelectorAll(".heart").length>15) return;
+let h=document.createElement("div");
+h.className="heart";
+h.innerHTML="❤️";
+h.style.left=Math.random()*100+"%";
+document.body.appendChild(h);
+setTimeout(()=>h.remove(),6000);
+},1200);
+}
+
+function balloons(){
+setInterval(()=>{
+if(document.querySelectorAll(".balloon").length>10) return;
+let b=document.createElement("div");
+b.className="balloon";
+b.innerHTML="🎈";
+b.style.left=Math.random()*100+"%";
+document.body.appendChild(b);
+setTimeout(()=>b.remove(),10000);
+},1500);
 }
 
 /* timeline */
