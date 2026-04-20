@@ -72,7 +72,6 @@ body{
   text-align:center;
 }
 
-/* button */
 button{
   padding:10px 15px;
   border:none;
@@ -81,7 +80,6 @@ button{
   color:white;
 }
 
-/* progress */
 .progress{
   position:absolute;
   top:0;
@@ -117,35 +115,30 @@ button{
   to{text-shadow:0 0 20px #ff4d6d;}
 }
 
-/* lightweight effects */
+/* ❤️ hearts */
 .heart, .balloon{
   position:absolute;
-  left:50%;
   bottom:0;
-  transform:translateX(-50%);
   pointer-events:none;
 }
 
 .heart{
   font-size:16px;
-  animation:heart 3.5s ease-out forwards;
+  animation:heartFloat 3.5s ease-out forwards;
 }
-@keyframes heart{
-  to{
-    transform:translate(calc(-50% + var(--x)), -70vh);
-    opacity:0;
-  }
+@keyframes heartFloat{
+  0%{transform:translateY(0) scale(0.8);opacity:1;}
+  100%{transform:translateY(-45vh) scale(1.2);opacity:0;}
 }
 
+/* 🎈 balloons */
 .balloon{
   font-size:20px;
-  animation:balloon 5s ease-out forwards;
+  animation:balloonFloat 5s ease-out forwards;
 }
-@keyframes balloon{
-  to{
-    transform:translate(calc(-50% + var(--x)), -85vh);
-    opacity:0;
-  }
+@keyframes balloonFloat{
+  0%{transform:translateY(0);opacity:1;}
+  100%{transform:translateY(-50vh);opacity:0;}
 }
 </style>
 </head>
@@ -224,11 +217,35 @@ const slides=[
 {img:"w9.jpeg",text:"And forever continues 💫"}
 ];
 
+/* ❤️ EMOTIONAL TIMELINE */
 const timeline=[
-{year:"2016 💍",img:"w1.jpeg",text:"The promise of forever ❤️"},
-{year:"2020 👶",img:"d1.jpeg",text:"Kundana Priya 💖"},
-{year:"2023 👶",img:"d2.jpeg",text:"Gaanavi Priya 🌸"},
-{year:"2025 👑",img:"s1.jpeg",text:"Himansh 👑"}
+{
+year:"2016 💍",
+img:"w1.jpeg",
+text:"The day everything changed…<br><br>\
+Two hearts promised to stand together… through every joy and every storm ❤️"
+},
+{
+year:"2020 👶",
+img:"d1.jpeg",
+text:"A tiny heartbeat entered their world…<br><br>\
+<b>Kundana Priya</b> 💖<br>\
+turning love into something they could hold"
+},
+{
+year:"2023 👶",
+img:"d2.jpeg",
+text:"Life smiled again…<br><br>\
+<b>Gaanavi Priya</b> 🌸<br>\
+bringing laughter, chaos, and endless happiness"
+},
+{
+year:"2025 👑",
+img:"s1.jpeg",
+text:"And then came the little king…<br><br>\
+<b>Himansh</b> 👑<br>\
+completing a beautiful story into something magical ❤️"
+}
 ];
 
 let i=0,t=0,currentImg=1;
@@ -273,18 +290,12 @@ active.classList.remove("active-img");
 
 document.getElementById("blur").style.backgroundImage=`url('${src}')`;
 
-let text=s.text;
-if(i>=slides.length-2){
-text+="<br><span style='font-size:12px;opacity:0.6'>Ending soon…</span>";
-}
-
-document.getElementById("quote").innerHTML=text;
+document.getElementById("quote").innerHTML=s.text;
 document.getElementById("counter").innerText=(i+1)+" / "+slides.length;
 
 progress();
 
 },80);
-
 };
 
 currentImg=currentImg===1?2:1;
@@ -305,7 +316,7 @@ b.style.width="0%";
 setTimeout(()=>{b.style.transition="width 4s linear"; b.style.width="100%";},50);
 }
 
-/* optimized hearts */
+/* ❤️ hearts full width */
 function hearts(){
 return setInterval(()=>{
 if(document.querySelectorAll(".heart").length>12) return;
@@ -313,9 +324,7 @@ if(document.querySelectorAll(".heart").length>12) return;
 let h=document.createElement("div");
 h.className="heart";
 h.innerHTML="❤️";
-
-let spread=(Math.random()-0.5)*140;
-h.style.setProperty("--x",spread+"px");
+h.style.left=Math.random()*100+"%";
 
 document.body.appendChild(h);
 setTimeout(()=>h.remove(),3500);
@@ -323,7 +332,7 @@ setTimeout(()=>h.remove(),3500);
 },700);
 }
 
-/* optimized balloons */
+/* 🎈 balloons full width */
 function balloons(){
 return setInterval(()=>{
 if(document.querySelectorAll(".balloon").length>8) return;
@@ -331,9 +340,7 @@ if(document.querySelectorAll(".balloon").length>8) return;
 let b=document.createElement("div");
 b.className="balloon";
 b.innerHTML="🎈";
-
-let spread=(Math.random()-0.5)*180;
-b.style.setProperty("--x",spread+"px");
+b.style.left=Math.random()*100+"%";
 
 document.body.appendChild(b);
 setTimeout(()=>b.remove(),5000);
@@ -343,7 +350,6 @@ setTimeout(()=>b.remove(),5000);
 
 /* timeline */
 function goTimeline(){
-
 clearInterval(heartInterval);
 clearInterval(balloonInterval);
 
@@ -375,18 +381,6 @@ else showFinal();
 /* final */
 function showFinal(){
 switchScreen("timeline","final");
-
-/* small burst only once */
-for(let i=0;i<20;i++){
-setTimeout(()=>{
-let h=document.createElement("div");
-h.className="heart";
-h.innerHTML="❤️";
-h.style.setProperty("--x",((Math.random()-0.5)*200)+"px");
-document.body.appendChild(h);
-setTimeout(()=>h.remove(),3000);
-},i*100);
-}
 
 let msg=[
 "10 years… countless memories ❤️",
