@@ -19,6 +19,7 @@ body{
   position:relative;
 }
 
+/* screens */
 .screen{
   position:absolute;
   width:100%;
@@ -32,6 +33,7 @@ body{
   pointer-events:auto;
 }
 
+/* DOUBLE IMAGE LAYER */
 .main-img{
   position:absolute;
   width:100%;
@@ -41,11 +43,13 @@ body{
   transform:scale(1);
   transition:opacity 1s ease, transform 6s ease;
 }
-.show{
+
+.active-img{
   opacity:1;
   transform:scale(1.08);
 }
 
+/* blur bg */
 .bg-blur{
   position:absolute;
   width:100%;
@@ -54,8 +58,10 @@ body{
   background-position:center;
   filter:blur(25px) brightness(0.6);
   transform:scale(1.1);
+  transition:background-image 0.8s ease;
 }
 
+/* overlay */
 .overlay{
   position:absolute;
   bottom:20px;
@@ -68,14 +74,16 @@ body{
   text-align:center;
 }
 
+/* button */
 button{
-  padding:10px;
+  padding:10px 15px;
   border:none;
   border-radius:8px;
   background:#ff4d6d;
   color:white;
 }
 
+/* progress */
 .progress{
   position:absolute;
   top:0;
@@ -84,6 +92,7 @@ button{
   width:0%;
 }
 
+/* popup */
 #msgBox{
   position:absolute;
   top:50%;
@@ -101,6 +110,7 @@ button{
   transform:translate(-50%,-50%) scale(1);
 }
 
+/* glow */
 .glow{
   animation:glow 2.5s infinite alternate;
 }
@@ -120,13 +130,16 @@ button{
 <!-- START -->
 <div id="start" class="screen active" style="display:flex;justify-content:center;align-items:center;flex-direction:column;">
 <h1>❤️ Welcome ❤️</h1>
-<p id="loadingText">Tap to Begin</p>
+<p>Tap to Begin</p>
 </div>
 
 <!-- MAIN -->
 <div id="main" class="screen">
 <div id="blur" class="bg-blur"></div>
-<img id="img" class="main-img">
+
+<!-- DOUBLE IMAGES -->
+<img id="img1" class="main-img active-img">
+<img id="img2" class="main-img">
 
 <div class="overlay">
 <h2 id="quote"></h2>
@@ -140,8 +153,8 @@ button{
 <p>
 ✨ This is just the beginning…<br><br>
 👉 Tap <b>Our Journey 🚗</b><br>
-to feel every moment again<br><br>
-🎁 Something beautiful awaits at the end ❤️
+to relive every moment<br><br>
+🎁 A surprise awaits ❤️
 </p>
 </div>
 
@@ -159,7 +172,7 @@ to feel every moment again<br><br>
 <!-- FINAL -->
 <div id="final" class="screen">
 <div class="bg-blur" style="background-image:url('images/w9.jpeg')"></div>
-<img src="images/w9.jpeg" class="main-img show">
+<img src="images/w9.jpeg" class="main-img active-img">
 
 <div class="overlay">
 <h2 class="glow">❤️ Happy 10th Anniversary ❤️</h2>
@@ -172,6 +185,7 @@ to feel every moment again<br><br>
 
 <script>
 
+/* slides */
 const slides=[
 {img:"w1.jpeg",text:"A journey that began with a single promise ❤️"},
 {img:"w2.jpeg",text:"Two hearts… choosing each other every day 💖"},
@@ -184,50 +198,73 @@ const slides=[
 {img:"w9.jpeg",text:"And forever still continues… 💫"}
 ];
 
-/* 🔥 EMOTIONAL TIMELINE */
+/* emotional timeline */
 const timeline=[
 {
 year:"2016 💍",
 img:"w1.jpeg",
-text:"The day two souls promised to walk together…<br>through every joy, every storm… forever ❤️"
+text:"The day two souls promised forever… ❤️"
 },
 {
 year:"2020 👶",
 img:"d1.jpeg",
-text:"A tiny heartbeat entered their world…<br><b>Kundana Priya</b> 💖<br>turning love into a new life"
+text:"A new heartbeat… Kundana Priya 💖<br>filled life with meaning"
 },
 {
 year:"2023 👶",
 img:"d2.jpeg",
-text:"Another blessing arrived…<br><b>Gaanavi Priya</b> 🌸<br>doubling the laughter, filling every corner with joy"
+text:"Another blessing… Gaanavi Priya 🌸<br>more laughter, more love"
 },
 {
 year:"2025 👑",
 img:"s1.jpeg",
-text:"And then came the little king…<br><b>Himansh Kaarthikeya Ram</b> 👑<br>completing their beautiful world ❤️"
+text:"A little king… Himansh 👑<br>completed their world ❤️"
 }
 ];
 
-let i=0,t=0;
+let i=0, t=0;
+let currentImg = 1;
 
-/* START */
+/* start */
 document.getElementById("start").onclick=()=>{
-document.getElementById("start").classList.remove("active");
-document.getElementById("main").classList.add("active");
+switchScreen("start","main");
 showSlide();
 };
 
-/* SLIDES */
+/* screen switch */
+function switchScreen(a,b){
+document.getElementById(a).classList.remove("active");
+document.getElementById(b).classList.add("active");
+}
+
+/* SLIDES (NO FLICKER) */
 function showSlide(){
-let s=slides[i];
-let img=document.getElementById("img");
 
-img.classList.remove("show");
+let s = slides[i];
+let src = "images/"+s.img;
 
+let img1 = document.getElementById("img1");
+let img2 = document.getElementById("img2");
+
+let active = currentImg===1 ? img1 : img2;
+let next   = currentImg===1 ? img2 : img1;
+
+/* preload before showing */
+let temp = new Image();
+temp.src = src;
+temp.onload = ()=>{
+
+next.src = src;
+
+/* crossfade */
 setTimeout(()=>{
-img.src="images/"+s.img;
-document.getElementById("blur").style.backgroundImage=`url('images/${s.img}')`;
+next.classList.add("active-img");
+active.classList.remove("active-img");
 
+/* update blur */
+document.getElementById("blur").style.backgroundImage=`url('${src}')`;
+
+/* text */
 let text=s.text;
 if(i>=slides.length-2){
 text+="<br><span style='font-size:12px;opacity:0.7'>Ending soon…</span>";
@@ -236,19 +273,26 @@ text+="<br><span style='font-size:12px;opacity:0.7'>Ending soon…</span>";
 document.getElementById("quote").innerHTML=text;
 document.getElementById("counter").innerText=(i+1)+" / "+slides.length+" images";
 
-img.classList.add("show");
 progress();
-},200);
 
-if(i<slides.length-1){
+},80);
+
+};
+
+/* switch buffer */
+currentImg = currentImg===1 ? 2 : 1;
+
+/* next */
+if(i < slides.length-1){
 i++;
 setTimeout(showSlide,4200);
 }else{
 setTimeout(()=>document.getElementById("msgBox").classList.add("show"),2000);
 }
+
 }
 
-/* PROGRESS */
+/* progress */
 function progress(){
 let b=document.getElementById("progress");
 b.style.transition="none";
@@ -256,11 +300,10 @@ b.style.width="0%";
 setTimeout(()=>{b.style.transition="width 4.2s linear"; b.style.width="100%";},50);
 }
 
-/* TIMELINE */
+/* timeline */
 function goTimeline(){
 document.getElementById("msgBox").classList.remove("show");
-document.getElementById("main").classList.remove("active");
-document.getElementById("timeline").classList.add("active");
+switchScreen("main","timeline");
 showYear();
 }
 
@@ -268,13 +311,13 @@ function showYear(){
 let d=timeline[t];
 let img=document.getElementById("tImg");
 
-img.classList.remove("show");
+img.classList.remove("active-img");
 
 setTimeout(()=>{
 img.src="images/"+d.img;
 document.getElementById("tBlur").style.backgroundImage=`url('images/${d.img}')`;
 document.getElementById("year").innerHTML=`<strong>${d.year}</strong><br><br>${d.text}`;
-img.classList.add("show");
+img.classList.add("active-img");
 },200);
 }
 
@@ -284,18 +327,14 @@ if(t<timeline.length) showYear();
 else showFinal();
 }
 
-/* FINAL */
+/* final */
 function showFinal(){
-document.getElementById("timeline").classList.remove("active");
-document.getElementById("final").classList.add("active");
+switchScreen("timeline","final");
 
 let msg=[
 "10 years… countless memories ❤️",
-"From two hearts… to a beautiful family 💖",
-"Through every smile, every tear…",
-"You built something eternal ✨",
-"This is not just love…",
-"This is forever ❤️"
+"From two hearts… to a family 💖",
+"This is forever ✨"
 ];
 
 let i=0;
